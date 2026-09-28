@@ -50,7 +50,7 @@ bool UART1_Available(void){
 }
 
 // =====================
-// UART1 Init @ 16MHz, 115200 baud
+// UART1 Init @ 50MHz, 115200 baud
 // UART1 RX=PB0, TX=PB1
 // =====================
 void UART1_Init(bool RxInt, bool TxInt){
@@ -64,8 +64,8 @@ void UART1_Init(bool RxInt, bool TxInt){
   UART1_RxInterruptEnabled = RxInt;
 
   UART1_CTL_R = 0;
-  UART1_IBRD_R = 8;
-  UART1_FBRD_R = 44;
+  UART1_IBRD_R = 27;
+  UART1_FBRD_R = 8;
   UART1_LCRH_R = UART_LCRH_WLEN_8; // 8-bit, no FIFO
   UART1_ICR_R = 0x7FF;
 
