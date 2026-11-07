@@ -3,77 +3,113 @@
 #include "SPI.h"
 #include "tm4c123gh6pm.h"
 #include "DelayTimer.h"
-#include "MOSFET.h"
+//#include "MOSFET.h"
 #include "Uart.h"
 #include "UART1.h"
 #include <stdint.h>
 #include <stdbool.h>
 
-//Make a struct to contain the memory map of notes and their where they work on the shift reg data
+
+
+//Memory map of notes and where they work on the shift reg data
 typedef struct{
 	uint8_t midiNote;
-	uint8_t bitMask;
+	uint64_t bitMask;
 	
 }NoteMap;
 
-const NoteMap NOTE_TABLE[8] =
+const NoteMap NOTE_TABLE[40] =
 {
-    {0x3C, 0x01},  // Middle C -> bit 0
-    {0x3E, 0x02},  // D        -> bit 1
-    {0x40, 0x04},  // E        -> bit 2
-    {0x41, 0x08},  // F        -> bit 3
-    {0x43, 0x10},  // G        -> bit 4
-    {0x45, 0x20},  // A        -> bit 5
-    {0x47, 0x40},  // B        -> bit 6
-    {0x48, 0x80}   // Next C   -> bit 7
+	{0x3C, 0x0000000001},  // C4 -> bit 0
+	{0x3E, 0x0000000002},  // D4 -> bit 1
+	{0x40, 0x0000000004},  // E4 -> bit 2
+	{0x41, 0x0000000008},  // F4 -> bit 3
+	{0x43, 0x0000000010},  // G4 -> bit 4
+	{0x45, 0x0000000020},  // A4 -> bit 5
+	{0x47, 0x0000000040},  // B4 -> bit 6
+	{0x48, 0x0000000080},  // C5 -> bit 7
+
+	{0x4A, 0x0000000100},  // D5 -> bit 8
+	{0x4C, 0x0000000200},  // E5 -> bit 9
+	{0x4D, 0x0000000400},  // F5 -> bit 10
+	{0x4F, 0x0000000800},  // G5 -> bit 11
+	{0x51, 0x0000001000},  // A5 -> bit 12
+	{0x53, 0x0000002000},  // B5 -> bit 13
+	{0x54, 0x0000004000},  // C6 -> bit 14
+	{0x56, 0x0000008000},  // D6 -> bit 15
+
+	{0x58, 0x0000010000},  // E6 -> bit 16
+	{0x59, 0x0000020000},  // F6 -> bit 17
+	{0x5B, 0x0000040000},  // G6 -> bit 18
+	{0x5D, 0x0000080000},  // A6 -> bit 19
+	{0x5F, 0x0000100000},  // B6 -> bit 20
+	{0x60, 0x0000200000},  // C7 -> bit 21
+	{0x62, 0x0000400000},  // D7 -> bit 22
+	{0x64, 0x0000800000},  // E7 -> bit 23
+
+	{0x65, 0x0001000000},  // F7 -> bit 24
+	{0x67, 0x0002000000},  // G7 -> bit 25
+	{0x69, 0x0004000000},  // A7 -> bit 26
+	{0x6B, 0x0008000000},  // B7 -> bit 27
+	{0x6C, 0x0010000000},  // C8 -> bit 28
+	{0x6E, 0x0020000000},  // D8 -> bit 29
+	{0x70, 0x0040000000},  // E8 -> bit 30
+	{0x71, 0x0080000000},  // F8 -> bit 31
+
+	{0x73, 0x0100000000},  // G8 -> bit 32
+	{0x75, 0x0200000000},  // A8 -> bit 33
+	{0x77, 0x0400000000},  // B8 -> bit 34
+	{0x78, 0x0800000000},  // C9 -> bit 35
+	{0x7A, 0x1000000000},  // D9 -> bit 36
+	{0x7C, 0x2000000000},  // E9 -> bit 37
+	{0x7D, 0x4000000000},  // F9 -> bit 38
+	{0x7F, 0x8000000000}   // G9 -> bit 39
 };
 
 //Function Prototypes
 void System_Init(void);
 void PrintData(uint8_t S,uint8_t D1, uint8_t D2);
-uint8_t FindNoteMask(uint8_t note);
+uint64_t FindNoteMask(uint8_t note);
 void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity);
+void UpdateShiftRegisters(void);
 
+void SPI_AllLEDsOff(void);
+
+void SPI_TestAll40LEDs(void);
 //Hold current reg bit states
-uint8_t shiftState = 0x00;
+uint64_t shiftState = 0x0000000000800000;
 
 
 
 int main(){
 	
 	System_Init();
+
+	SPI_AllLEDsOff();
 	UART1_OutString((uint8_t*)"System Ready!\r\n");
 	UART_OutString((uint8_t*)"System Ready!\r\n");
-	uint8_t data = 0x01;
-	
+
+	UpdateShiftRegisters();
+	//SPI_TestAll40LEDs();
 	while(1){
- 
+
 		//Read incoming data then update reg
-		
-		if(UART_Available()){
-			
-			//Parse out MIDI message
-			uint8_t Status = UART_InChar();
-			uint8_t Note = UART_InChar();
-			uint8_t Velocity = UART_InChar();
-			
-			//process the shift reg state
-			ProcessMIDI(Status, Note,Velocity);
-			
-			//print out MIDI data
-			PrintData(Status,Note,Velocity);
-			UART1_OutString((uint8_t*)"=======\r\n");
-		
-		}
-		
-		
-//		UnLatch();
-//		SPI_Write(data);
-//		Latch_Pulse();
-//		DelayMs(1000);
-//		data = data <<  1;
-		
-		
+
+		// if(UART_Available()){
+		//
+		// 	//Parse out MIDI message
+		// 	uint8_t Status = UART_InChar();
+		// 	uint8_t Note = UART_InChar();
+		// 	uint8_t Velocity = UART_InChar();
+		//
+		// 	//process the shift reg state
+		// 	ProcessMIDI(Status, Note,Velocity);
+		//
+		// 	//print out MIDI data
+		// 	PrintData(Status,Note,Velocity);
+		// 	UART1_OutString((uint8_t*)"=======\r\n");
+		//
+		// }
 	
 	}
 	
@@ -105,23 +141,37 @@ void PrintData(uint8_t S,uint8_t D1, uint8_t D2){
 	
 }
 
-uint8_t FindNoteMask(uint8_t note)
+//Uses Binary Search to find note mask
+uint64_t FindNoteMask(uint8_t note)
 {
-    for (uint8_t i = 0; i < 8; i++)
-    {
-        if (NOTE_TABLE[i].midiNote == note)
-        {
-            return NOTE_TABLE[i].bitMask;
-        }
-    }
+	uint8_t low = 0;
+	uint8_t high = 40;  // One past the last table entry
 
-    return 0;  // Note is not mapped
+	while (low < high)
+	{
+		uint8_t mid = low + (high - low) / 2;
+
+		if (NOTE_TABLE[mid].midiNote == note)
+		{
+			return NOTE_TABLE[mid].bitMask;
+		}
+		else if (note < NOTE_TABLE[mid].midiNote)
+		{
+			high = mid;
+		}
+		else
+		{
+			low = mid + 1;
+		}
+	}
+
+	return 0;  // Note is not mapped
 }
 
-
+//process the recieved MIDI data and determin what note to play
 void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity)
 {
-    uint8_t mask = FindNoteMask(note);
+    uint64_t mask = FindNoteMask(note);
 
     if (mask == 0)
     {
@@ -130,17 +180,66 @@ void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity)
 
     uint8_t command = status & 0xF0;
 
+	//set bit if command is on
     if (command == 0x90 && velocity != 0)
     {
         shiftState |= mask;
     }
-    else if (command == 0x80 ||
-             (command == 0x90 && velocity == 0))
+	//clear the coresponding bit
+    else if (command == 0x80 ||(command == 0x90 && velocity == 0))
     {
         shiftState &= ~mask;
     }
 
-    UnLatch();
-    SPI_Write(shiftState);
-    Latch_Pulse();
+	//update shift regs
+    UpdateShiftRegisters();
+}
+
+//Update Shift regs
+void UpdateShiftRegisters(void)
+{
+	UnLatch();
+
+	for (int8_t byte = 4; byte >= 0; byte--)
+	{
+		SPI_Write((uint8_t)(shiftState >> (byte * 8)));
+	}
+
+	Latch_Pulse();
+}
+
+//Test all LEDS
+void SPI_TestAll40LEDs(void)
+{
+	uint64_t pattern = 1ULL;
+
+	for (uint8_t led = 0; led < 40; led++)
+	{
+		SPI_Write((uint8_t)(pattern >> 32));
+		SPI_Write((uint8_t)(pattern >> 24));
+		SPI_Write((uint8_t)(pattern >> 16));
+		SPI_Write((uint8_t)(pattern >> 8));
+		SPI_Write((uint8_t)pattern);
+
+		Latch_Pulse();
+		DelayMs(50);
+
+		pattern <<= 1;
+	}
+
+	// Clear all five shift registers
+	for (uint8_t i = 0; i < 5; i++)
+		SPI_Write(0x00);
+
+	Latch_Pulse();
+}
+//Turn all LEDS off
+void SPI_AllLEDsOff(void)
+{
+	for (uint8_t i = 0; i < 5; i++)
+	{
+		SPI_Write(0x00);
+	}
+
+	Latch_Pulse();
 }
