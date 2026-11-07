@@ -77,7 +77,7 @@ void SPI_AllLEDsOff(void);
 
 void SPI_TestAll40LEDs(void);
 //Hold current reg bit states
-uint64_t shiftState = 0x0000000000800000;
+uint64_t shiftState = 0x0000000000000000;
 
 
 
@@ -87,29 +87,27 @@ int main(){
 
 	SPI_AllLEDsOff();
 	UART1_OutString((uint8_t*)"System Ready!\r\n");
-	UART_OutString((uint8_t*)"System Ready!\r\n");
 
-	UpdateShiftRegisters();
-	//SPI_TestAll40LEDs();
+
 	while(1){
 
 		//Read incoming data then update reg
 
-		// if(UART_Available()){
-		//
-		// 	//Parse out MIDI message
-		// 	uint8_t Status = UART_InChar();
-		// 	uint8_t Note = UART_InChar();
-		// 	uint8_t Velocity = UART_InChar();
-		//
-		// 	//process the shift reg state
-		// 	ProcessMIDI(Status, Note,Velocity);
-		//
-		// 	//print out MIDI data
-		// 	PrintData(Status,Note,Velocity);
-		// 	UART1_OutString((uint8_t*)"=======\r\n");
-		//
-		// }
+		 if(UART_Available()){
+
+		 	//Parse out MIDI message
+		 	uint8_t Status = UART_InChar();
+		 	uint8_t Note = UART_InChar();
+		 	uint8_t Velocity = UART_InChar();
+
+		 	//process the shift reg state
+			ProcessMIDI(Status, Note,Velocity);
+
+		 	//print out MIDI data
+		 	PrintData(Status,Note,Velocity);
+		 	UART1_OutString((uint8_t*)"=======\r\n");
+
+		}
 	
 	}
 	
@@ -125,6 +123,7 @@ void System_Init(){
 	Latch_Init();
 	DelayTimer_Init();
 	UART1_Init(false,false);
+	__asm volatile ("cpsie i" ::: "memory");
 }
 
 void PrintData(uint8_t S,uint8_t D1, uint8_t D2){
