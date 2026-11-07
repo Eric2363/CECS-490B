@@ -20,50 +20,50 @@ typedef struct{
 
 const NoteMap NOTE_TABLE[40] =
 {
-	{0x3C, 0x0000000001},  // C4 -> bit 0
-	{0x3E, 0x0000000002},  // D4 -> bit 1
-	{0x40, 0x0000000004},  // E4 -> bit 2
-	{0x41, 0x0000000008},  // F4 -> bit 3
-	{0x43, 0x0000000010},  // G4 -> bit 4
-	{0x45, 0x0000000020},  // A4 -> bit 5
-	{0x47, 0x0000000040},  // B4 -> bit 6
-	{0x48, 0x0000000080},  // C5 -> bit 7
+	{0x3C, 0x0000000001},  // C4  -> bit 0
+	{0x3D, 0x0000000002},  // C#4 -> bit 1
+	{0x3E, 0x0000000004},  // D4  -> bit 2
+	{0x3F, 0x0000000008},  // D#4 -> bit 3
+	{0x40, 0x0000000010},  // E4  -> bit 4
+	{0x41, 0x0000000020},  // F4  -> bit 5
+	{0x42, 0x0000000040},  // F#4 -> bit 6
+	{0x43, 0x0000000080},  // G4  -> bit 7
 
-	{0x4A, 0x0000000100},  // D5 -> bit 8
-	{0x4C, 0x0000000200},  // E5 -> bit 9
-	{0x4D, 0x0000000400},  // F5 -> bit 10
-	{0x4F, 0x0000000800},  // G5 -> bit 11
-	{0x51, 0x0000001000},  // A5 -> bit 12
-	{0x53, 0x0000002000},  // B5 -> bit 13
-	{0x54, 0x0000004000},  // C6 -> bit 14
-	{0x56, 0x0000008000},  // D6 -> bit 15
+	{0x44, 0x0000000100},  // G#4 -> bit 8
+	{0x45, 0x0000000200},  // A4  -> bit 9
+	{0x46, 0x0000000400},  // A#4 -> bit 10
+	{0x47, 0x0000000800},  // B4  -> bit 11
+	{0x48, 0x0000001000},  // C5  -> bit 12
+	{0x49, 0x0000002000},  // C#5 -> bit 13
+	{0x4A, 0x0000004000},  // D5  -> bit 14
+	{0x4B, 0x0000008000},  // D#5 -> bit 15
 
-	{0x58, 0x0000010000},  // E6 -> bit 16
-	{0x59, 0x0000020000},  // F6 -> bit 17
-	{0x5B, 0x0000040000},  // G6 -> bit 18
-	{0x5D, 0x0000080000},  // A6 -> bit 19
-	{0x5F, 0x0000100000},  // B6 -> bit 20
-	{0x60, 0x0000200000},  // C7 -> bit 21
-	{0x62, 0x0000400000},  // D7 -> bit 22
-	{0x64, 0x0000800000},  // E7 -> bit 23
+	{0x4C, 0x0000010000},  // E5  -> bit 16
+	{0x4D, 0x0000020000},  // F5  -> bit 17
+	{0x4E, 0x0000040000},  // F#5 -> bit 18
+	{0x4F, 0x0000080000},  // G5  -> bit 19
+	{0x50, 0x0000100000},  // G#5 -> bit 20
+	{0x51, 0x0000200000},  // A5  -> bit 21
+	{0x52, 0x0000400000},  // A#5 -> bit 22
+	{0x53, 0x0000800000},  // B5  -> bit 23
 
-	{0x65, 0x0001000000},  // F7 -> bit 24
-	{0x67, 0x0002000000},  // G7 -> bit 25
-	{0x69, 0x0004000000},  // A7 -> bit 26
-	{0x6B, 0x0008000000},  // B7 -> bit 27
-	{0x6C, 0x0010000000},  // C8 -> bit 28
-	{0x6E, 0x0020000000},  // D8 -> bit 29
-	{0x70, 0x0040000000},  // E8 -> bit 30
-	{0x71, 0x0080000000},  // F8 -> bit 31
+	{0x54, 0x0001000000},  // C6  -> bit 24
+	{0x55, 0x0002000000},  // C#6 -> bit 25
+	{0x56, 0x0004000000},  // D6  -> bit 26
+	{0x57, 0x0008000000},  // D#6 -> bit 27
+	{0x58, 0x0010000000},  // E6  -> bit 28
+	{0x59, 0x0020000000},  // F6  -> bit 29
+	{0x5A, 0x0040000000},  // F#6 -> bit 30
+	{0x5B, 0x0080000000},  // G6  -> bit 31
 
-	{0x73, 0x0100000000},  // G8 -> bit 32
-	{0x75, 0x0200000000},  // A8 -> bit 33
-	{0x77, 0x0400000000},  // B8 -> bit 34
-	{0x78, 0x0800000000},  // C9 -> bit 35
-	{0x7A, 0x1000000000},  // D9 -> bit 36
-	{0x7C, 0x2000000000},  // E9 -> bit 37
-	{0x7D, 0x4000000000},  // F9 -> bit 38
-	{0x7F, 0x8000000000}   // G9 -> bit 39
+	{0x5C, 0x0100000000},  // G#6 -> bit 32
+	{0x5D, 0x0200000000},  // A6  -> bit 33
+	{0x5E, 0x0400000000},  // A#6 -> bit 34
+	{0x5F, 0x0800000000},  // B6  -> bit 35
+	{0x60, 0x1000000000},  // C7  -> bit 36
+	{0x61, 0x2000000000},  // C#7 -> bit 37
+	{0x62, 0x4000000000},  // D7  -> bit 38
+	{0x63, 0x8000000000}   // D#7 -> bit 39
 };
 
 //Function Prototypes
@@ -72,13 +72,14 @@ void PrintData(uint8_t S,uint8_t D1, uint8_t D2);
 uint64_t FindNoteMask(uint8_t note);
 void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity);
 void UpdateShiftRegisters(void);
-
+uint8_t FoldNoteToRange(uint8_t note);
 void SPI_AllLEDsOff(void);
 
 void SPI_TestAll40LEDs(void);
 //Hold current reg bit states
 uint64_t shiftState = 0x0000000000000000;
-
+static bool inputNoteHeld[128] = {false};
+static uint8_t outputHoldCount[40] = {0};
 
 
 int main(){
@@ -88,7 +89,7 @@ int main(){
 	SPI_AllLEDsOff();
 	UART1_OutString((uint8_t*)"System Ready!\r\n");
 
-
+	SPI_TestAll40LEDs();
 	while(1){
 
 		//Read incoming data then update reg
@@ -167,6 +168,7 @@ uint64_t FindNoteMask(uint8_t note)
 	return 0;  // Note is not mapped
 }
 
+/*
 //process the recieved MIDI data and determin what note to play
 void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity)
 {
@@ -193,7 +195,56 @@ void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity)
 	//update shift regs
     UpdateShiftRegisters();
 }
+*/
+void ProcessMIDI(uint8_t status, uint8_t note, uint8_t velocity)
+{
+	uint8_t command = status & 0xF0;
+	uint8_t mappedNote = FoldNoteToRange(note);
+	uint8_t outputIndex = mappedNote - 0x3C;
+	uint64_t mask = FindNoteMask(mappedNote);
 
+	if (command == 0x90 && velocity != 0)  // Note On
+	{
+		if (!inputNoteHeld[note])
+		{
+			inputNoteHeld[note] = true;
+			outputHoldCount[outputIndex]++;
+			shiftState |= mask;
+			UpdateShiftRegisters();
+		}
+	}
+	else if (command == 0x80 || (command == 0x90 && velocity == 0))  // Note Off
+	{
+		if (inputNoteHeld[note])
+		{
+			inputNoteHeld[note] = false;
+			outputHoldCount[outputIndex]--;
+
+			if (outputHoldCount[outputIndex] == 0)
+			{
+				shiftState &= ~mask;
+			}
+
+			UpdateShiftRegisters();
+		}
+	}
+}
+// Move notes into the mapped range, C4 (60) through D#7 (99),
+// preserving the note's pitch class.
+uint8_t FoldNoteToRange(uint8_t note)
+{
+	while (note < 0x3C)  // Below C4
+	{
+		note += 12;
+	}
+
+	while (note > 0x63)  // Above D#7
+	{
+		note -= 12;
+	}
+
+	return note;
+}
 //Update Shift regs
 void UpdateShiftRegisters(void)
 {

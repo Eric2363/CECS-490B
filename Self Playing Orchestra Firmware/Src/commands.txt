@@ -2,3 +2,8 @@
 Coomand to open com port on Ubuntu
 ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null
 screen /dev/ttyUSB0 115200
+
+
+//play midi through terminal
+aplaymidi -l
+aplaymidi -p 128:0 "/path/to/your-song.mid"
