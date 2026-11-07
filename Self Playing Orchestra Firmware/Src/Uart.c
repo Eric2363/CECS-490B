@@ -53,42 +53,59 @@ bool UART_Available(void){
   return !rb_empty(&RxRB);
 }
 
+
 // =====================
-// UART Init @ 16Mhz 115,200 baud
+// UART Init: 50 MHz, 115,200 baud
 // =====================
-void UART_Init(bool RxInt, bool TxInt){
-  SYSCTL_RCGC1_R |= SYSCTL_RCGC1_UART0; // activate UART0
-  SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA; // activate port A
+void UART_Init(bool RxInt, bool TxInt)
+{
+    SYSCTL_RCGC1_R |= SYSCTL_RCGC1_UART0;
+    SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOA;
 
-  rb_Init(&RxRB);
-  RxInterruptEnabled = RxInt;
+    while ((SYSCTL_PRUART_R & 0x01) == 0) {}
+    while ((SYSCTL_PRGPIO_R & 0x01) == 0) {}
 
-  UART0_CTL_R = 0;                      // disable UART
-  UART0_IBRD_R = 8;                    // IBRD = int(16,000,000 / (16 * 115,200)) = int(8.680)
-  UART0_FBRD_R = 44;                     // FBRD = int(0.680 * 64 + 0.5) = 44
-  UART0_LCRH_R = UART_LCRH_WLEN_8;      // 8-bit, no FIFO
-  UART0_ICR_R = 0x7FF;                  // clear all UART interrupt flags
+    rb_Init(&RxRB);
+    RxInterruptEnabled = RxInt;
 
-  // take care of interrupt setup
-  if(RxInt || TxInt){
-    NVIC_PRI1_R = (NVIC_PRI1_R & ~0x0000E000) | 0x0000A000; // priority 5
-    NVIC_EN0_R |= NVIC_EN0_UART0;                           // enable UART0 interrupt in NVIC
+    // Configure UART pins first: PA0 = RX, PA1 = TX
+    GPIO_PORTA_AFSEL_R |= 0x03;
+    GPIO_PORTA_DEN_R   |= 0x03;
+    GPIO_PORTA_PCTL_R =
+        (GPIO_PORTA_PCTL_R & 0xFFFFFF00) | 0x00000011;
+    GPIO_PORTA_AMSEL_R &= ~0x03;
 
-    if(RxInt){
-      UART0_IM_R |= UART_IM_RXIM;         // Enable RX interrupt
+    UART0_CTL_R = 0;       // Disable UART during setup
+    UART0_CC_R = 0x00;     // Use 50 MHz system clock
+
+    UART0_IBRD_R = 27;     // 115,200 baud
+    UART0_FBRD_R = 8;
+    UART0_LCRH_R = UART_LCRH_WLEN_8;
+
+    UART0_ICR_R = 0x7FF;   // Clear pending flags
+    UART0_IM_R = 0;        // Clear old interrupt enables
+
+    if (RxInt)
+    {
+        UART0_IM_R |= UART_IM_RXIM;
     }
 
-    if(TxInt){
-      UART0_IM_R |= UART_IM_TXIM;         // Enable TX interrupt
+    if (TxInt)
+    {
+        UART0_IM_R |= UART_IM_TXIM;
     }
-  }
 
-  UART0_CTL_R |= UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN; // enable Tx, RX and UART
+    UART0_CTL_R = UART_CTL_RXE |
+                  UART_CTL_TXE |
+                  UART_CTL_UARTEN;
 
-  GPIO_PORTA_AFSEL_R |= 0x03;           // enable alt funct on PA1-0
-  GPIO_PORTA_DEN_R |= 0x03;             // enable digital I/O on PA1-0
-  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R & 0xFFFFFF00) + 0x00000011; // configure PA1-0 as UART
-  GPIO_PORTA_AMSEL_R &= ~0x03;          // disable analog functionality on PA
+    if (RxInt || TxInt)
+    {
+        NVIC_PRI1_R =
+            (NVIC_PRI1_R & ~0x0000E000) | 0x0000A000;
+
+        NVIC_EN0_R |= NVIC_EN0_UART0;
+    }
 }
 
 // =====================
